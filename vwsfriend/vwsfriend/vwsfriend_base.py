@@ -326,10 +326,11 @@ async def main():  # noqa: C901 pylint: disable=too-many-branches, too-many-stat
     weConnect = None
     mqttCLient = None
     try:  # pylint: disable=too-many-nested-blocks
+        print("Initialize to WeConnect")
         weConnect = weconnect.WeConnect(username=weConnectUsername, password=weConnectPassword, spin=weConnectSpin, tokenfile=tokenfile,
                                         updateAfterLogin=False, loginOnInit=False, maxAgePictures=86400, forceReloginAfter=21600, numRetries=5,
                                         timeout=180)
-        
+        print("Connect to WeConnect")
         await weConnect.connect(username=weConnectUsername, password=weConnectPassword)
 
         connector = AgentConnector(weConnect=weConnect, dbUrl=args.dbUrl, interval=args.interval, withDB=args.withDatabase, withABRP=args.withABRP,
@@ -583,6 +584,9 @@ async def main():  # noqa: C901 pylint: disable=too-many-branches, too-many-stat
     except APICompatibilityError as e:
         LOG.critical('There was a problem when communicating with WeConnect.'
                      ' If this problem persists please open a bug report: %s', e)
+    except Exception as e:
+        LOG.critical('There was an unexpected problem: %s', e)
+        sys.exit(1)
     finally:
         if weConnect is not None:
             weConnect.disconnect()
