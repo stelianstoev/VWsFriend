@@ -323,6 +323,7 @@ async def main():  # noqa: C901 pylint: disable=too-many-branches, too-many-stat
     if not args.noTokenStorage:
         tokenfile = args.tokenfile
 
+    LOG.info('Starting up VWsFriend')
     weConnect = None
     mqttCLient = None
     try:  # pylint: disable=too-many-nested-blocks
