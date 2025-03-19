@@ -326,11 +326,11 @@ async def main():  # noqa: C901 pylint: disable=too-many-branches, too-many-stat
     weConnect = None
     mqttCLient = None
     try:  # pylint: disable=too-many-nested-blocks
-        print("Initialize to WeConnect")
+        LOG.info("Initialize to WeConnect")
         weConnect = weconnect.WeConnect(username=weConnectUsername, password=weConnectPassword, spin=weConnectSpin, tokenfile=tokenfile,
                                         updateAfterLogin=False, loginOnInit=False, maxAgePictures=86400, forceReloginAfter=21600, numRetries=5,
                                         timeout=180)
-        print("Connect to WeConnect")
+        LOG.info("Connect to WeConnect")
         await weConnect.connect(username=weConnectUsername, password=weConnectPassword)
 
         connector = AgentConnector(weConnect=weConnect, dbUrl=args.dbUrl, interval=args.interval, withDB=args.withDatabase, withABRP=args.withABRP,
@@ -519,27 +519,7 @@ async def main():  # noqa: C901 pylint: disable=too-many-branches, too-many-stat
                         mqttCLient.updateWeConnect(reraise=True)
                     else:
                         LOG.info('Updating data from WeConnect')
-                        await weConnect.update(updateCapabilities=True, updatePictures=True, force=True, selective=[Domain.ACCESS,
-                                                                                                              Domain.ACTIVEVENTILATION,
-                                                                                                              Domain.AUTOMATION,
-                                                                                                              Domain.AUXILIARY_HEATING,
-                                                                                                              Domain.USER_CAPABILITIES,
-                                                                                                              Domain.CHARGING,
-                                                                                                              Domain.CHARGING_PROFILES,
-                                                                                                              Domain.BATTERY_CHARGING_CARE,
-                                                                                                              Domain.CLIMATISATION,
-                                                                                                              Domain.CLIMATISATION_TIMERS,
-                                                                                                              Domain.DEPARTURE_TIMERS,
-                                                                                                              Domain.FUEL_STATUS,
-                                                                                                              Domain.VEHICLE_LIGHTS,
-                                                                                                              Domain.LV_BATTERY,
-                                                                                                              Domain.READINESS,
-                                                                                                              Domain.VEHICLE_HEALTH_INSPECTION,
-                                                                                                              Domain.VEHICLE_HEALTH_WARNINGS,
-                                                                                                              Domain.OIL_LEVEL,
-                                                                                                              Domain.MEASUREMENTS,
-                                                                                                              Domain.BATTERY_SUPPORT,
-                                                                                                              Domain.PARKING])
+                        await weConnect.update()
                     connector.commit()
                     if args.withHomekit and not weConnectBridgeInitialized:
                         weConnectBridgeInitialized = True
