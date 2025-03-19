@@ -72,7 +72,7 @@ class NumberRangeArgument:
         return argparse.ArgumentTypeError('Must be a number')
 
 
-def main():  # noqa: C901 pylint: disable=too-many-branches, too-many-statements, too-many-locals
+async def main():  # noqa: C901 pylint: disable=too-many-branches, too-many-statements, too-many-locals
     parser = argparse.ArgumentParser(
         prog='vwsfriend',
         description='TBD')
@@ -327,8 +327,10 @@ def main():  # noqa: C901 pylint: disable=too-many-branches, too-many-statements
     mqttCLient = None
     try:  # pylint: disable=too-many-nested-blocks
         weConnect = weconnect.WeConnect(username=weConnectUsername, password=weConnectPassword, spin=weConnectSpin, tokenfile=tokenfile,
-                                        updateAfterLogin=False, loginOnInit=(args.demo is None), maxAgePictures=86400, forceReloginAfter=21600, numRetries=5,
+                                        updateAfterLogin=False, loginOnInit=False, maxAgePictures=86400, forceReloginAfter=21600, numRetries=5,
                                         timeout=180)
+        
+        await weConnect.connect(username=weConnectUsername, password=weConnectPassword)
 
         connector = AgentConnector(weConnect=weConnect, dbUrl=args.dbUrl, interval=args.interval, withDB=args.withDatabase, withABRP=args.withABRP,
                                    configDir=args.configDir, privacy=args.privacy)
@@ -498,7 +500,7 @@ def main():  # noqa: C901 pylint: disable=too-many-branches, too-many-statements
                         if args.withHomekit and not weConnectBridgeInitialized:
                             weConnectBridgeInitialized = True
                             bridge.update()
-                        weConnect.update(updateCapabilities=True, updatePictures=False)
+                        await weConnect.update(updateCapabilities=True, updatePictures=False)
                         connector.commit()
                         if match.groupdict()['stage'] is not None:
                             LOG.info('Stage %s completed', match.groupdict()['stage'])
@@ -516,7 +518,7 @@ def main():  # noqa: C901 pylint: disable=too-many-branches, too-many-statements
                         mqttCLient.updateWeConnect(reraise=True)
                     else:
                         LOG.info('Updating data from WeConnect')
-                        weConnect.update(updateCapabilities=True, updatePictures=True, force=True, selective=[Domain.ACCESS,
+                        await weConnect.update(updateCapabilities=True, updatePictures=True, force=True, selective=[Domain.ACCESS,
                                                                                                               Domain.ACTIVEVENTILATION,
                                                                                                               Domain.AUTOMATION,
                                                                                                               Domain.AUXILIARY_HEATING,
