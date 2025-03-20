@@ -32,7 +32,7 @@ setup(
     },
     entry_points={
         'console_scripts': [
-            'vwsfriend = vwsfriend.vwsfriend_base:main',
+            'vwsfriend = vwsfriend.entryPoint:main',
         ],
     },
     classifiers=[
